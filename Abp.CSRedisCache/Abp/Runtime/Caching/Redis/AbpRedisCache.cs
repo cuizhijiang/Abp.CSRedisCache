@@ -5,10 +5,9 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Abp.Domain.Entities;
 using Abp.Reflection.Extensions;
-using Abp.Runtime.Caching;
 using CSRedis;
 
-namespace Abp.CSRedisCache
+namespace Abp.Runtime.Caching.Redis
 {
     /// <summary>
     /// Used to store cache in a Redis server.
@@ -26,6 +25,10 @@ namespace Abp.CSRedisCache
             IRedisCacheSerializer redisCacheSerializer)
             : base(name)
         {
+            if (options.DatabaseId>-1)
+            {
+                options.ConnectionString = options.ConnectionString.TrimEnd(';')+ ",defualtDatabase=" + options.DatabaseId;
+            }
             var csredis = new CSRedisClient(options.ConnectionString);
             RedisHelper.Initialization(csredis);
             _serializer = redisCacheSerializer;

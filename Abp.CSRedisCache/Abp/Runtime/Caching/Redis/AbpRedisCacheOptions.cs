@@ -2,7 +2,7 @@
 using Abp.Configuration.Startup;
 using Abp.Extensions;
 
-namespace Abp.CSRedisCache
+namespace Abp.Runtime.Caching.Redis
 {
     public class AbpRedisCacheOptions
     {

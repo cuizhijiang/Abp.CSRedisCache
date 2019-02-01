@@ -1,15 +1,14 @@
 ﻿using Abp.Dependency;
 using Abp.Json;
-using Abp.Runtime.Caching;
 using Newtonsoft.Json;
 using System;
 
-namespace Abp.CSRedisCache
+namespace Abp.Runtime.Caching.Redis
 {
     /// <summary>
     ///     Default implementation uses JSON as the underlying persistence mechanism.
     /// </summary>
-    public class DefaultCSRedisCacheSerializer : IRedisCacheSerializer, ITransientDependency
+    public class DefaultRedisCacheSerializer : IRedisCacheSerializer, ITransientDependency
     {
         /// <summary>
         ///     Creates an instance of the object from its serialized string representation.

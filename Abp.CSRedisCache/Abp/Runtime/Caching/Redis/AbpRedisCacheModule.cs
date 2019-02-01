@@ -1,8 +1,7 @@
-﻿using System.Reflection;
-using Abp.Modules;
+﻿using Abp.Modules;
 using Abp.Reflection.Extensions;
 
-namespace Abp.CSRedisCache
+namespace Abp.Runtime.Caching.Redis
 {
     /// <summary>
     /// This modules is used to replace ABP's cache system with Redis server.

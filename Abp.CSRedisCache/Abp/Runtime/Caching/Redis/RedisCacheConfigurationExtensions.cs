@@ -1,9 +1,8 @@
 ﻿using System;
 using Abp.Dependency;
-using Abp.Runtime.Caching;
 using Abp.Runtime.Caching.Configuration;
 
-namespace Abp.CSRedisCache
+namespace Abp.Runtime.Caching.Redis
 {
     /// <summary>
     /// Extension methods for <see cref="ICachingConfiguration"/>.
