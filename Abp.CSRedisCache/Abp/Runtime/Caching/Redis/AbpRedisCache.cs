@@ -21,16 +21,9 @@ namespace Abp.Runtime.Caching.Redis
         /// </summary>
         public AbpRedisCache(
             string name,
-            AbpRedisCacheOptions options,
             IRedisCacheSerializer redisCacheSerializer)
             : base(name)
         {
-            if (options.DatabaseId>-1)
-            {
-                options.ConnectionString = options.ConnectionString.TrimEnd(';')+ ",defualtDatabase=" + options.DatabaseId;
-            }
-            var csredis = new CSRedisClient(options.ConnectionString);
-            RedisHelper.Initialization(csredis);
             _serializer = redisCacheSerializer;
         }
 
@@ -44,7 +37,7 @@ namespace Abp.Runtime.Caching.Redis
         {
             var redisKeys = keys.Select(GetLocalizedRedisKey);
             var redisValues = RedisHelper.MGet(redisKeys.ToArray());
-             var objbytes = redisValues.Select(obj => !string.IsNullOrWhiteSpace(obj) ? Deserialize(obj) : null);
+            var objbytes = redisValues.Select(obj => !string.IsNullOrWhiteSpace(obj) ? Deserialize(obj) : null);
             return objbytes.ToArray();
         }
 

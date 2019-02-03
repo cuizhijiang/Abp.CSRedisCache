@@ -18,5 +18,14 @@ namespace Abp.Runtime.Caching.Redis
         {
             IocManager.RegisterAssemblyByConvention(typeof(AbpRedisCacheModule).GetAssembly());
         }
+        public override void PostInitialize()
+        {
+            var options = IocManager.Resolve<AbpRedisCacheOptions>();
+            if (options.DatabaseId > -1)
+            {
+                options.ConnectionString = options.ConnectionString.TrimEnd(';') + ",defaultDatabase=" + options.DatabaseId;
+            }
+            RedisHelper.Initialization(new CSRedis.CSRedisClient(options.ConnectionString));
+        }
     }
 }
