@@ -21,11 +21,12 @@ namespace Abp.Runtime.Caching.Redis
         public override void PostInitialize()
         {
             var options = IocManager.Resolve<AbpRedisCacheOptions>();
+            var connectionString = options.ConnectionString;
             if (options.DatabaseId > -1)
             {
-                options.ConnectionString = options.ConnectionString.TrimEnd(';') + ",defaultDatabase=" + options.DatabaseId;
+                connectionString = options.ConnectionString.TrimEnd(';') + ",defaultDatabase=" + options.DatabaseId;
             }
-            RedisHelper.Initialization(new CSRedis.CSRedisClient(options.ConnectionString));
+            RedisHelper.Initialization(new CSRedis.CSRedisClient(connectionString));
         }
     }
 }
