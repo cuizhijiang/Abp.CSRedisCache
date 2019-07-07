@@ -5,7 +5,6 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Abp.Domain.Entities;
 using Abp.Reflection.Extensions;
-using CSRedis;
 
 namespace Abp.Runtime.Caching.Redis
 {
@@ -43,8 +42,7 @@ namespace Abp.Runtime.Caching.Redis
 
         public override async Task<object> GetOrDefaultAsync(string key)
         {
-            var objbyte = await RedisHelper.GetAsync(GetLocalizedRedisKey(key));
-            return !string.IsNullOrWhiteSpace(objbyte) ? Deserialize(objbyte) : null;
+            return await Task.FromResult(GetOrDefault(key));
         }
 
         public override async Task<object[]> GetOrDefaultAsync(string[] keys)
