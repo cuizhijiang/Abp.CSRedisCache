@@ -141,7 +141,7 @@ namespace Abp.Runtime.Caching.Redis
                 local keys = redis.call('keys', ARGV[1]) 
                 for i=1,#keys,5000 do 
                 redis.call('del', unpack(keys, i, math.min(i+4999, #keys)))
-                end", GetLocalizedRedisKey("*"));
+                end","", GetLocalizedRedisKey("*"));
         }
 
         protected virtual Type GetSerializableType(object value)
