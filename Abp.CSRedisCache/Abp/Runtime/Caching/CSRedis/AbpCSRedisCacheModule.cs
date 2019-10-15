@@ -1,13 +1,14 @@
 ﻿using Abp.Modules;
 using Abp.Reflection.Extensions;
+using CSRedis;
 
-namespace Abp.Runtime.Caching.Redis
+namespace Abp.Runtime.Caching.CSRedis
 {
     /// <summary>
-    /// This modules is used to replace ABP's cache system with Redis server.
+    ///     This modules is used to replace ABP's cache system with Redis server.
     /// </summary>
     [DependsOn(typeof(AbpKernelModule))]
-    public class AbpRedisCacheModule : AbpModule
+    public class AbpCsRedisCacheModule : AbpModule
     {
         public override void PreInitialize()
         {
@@ -16,17 +17,16 @@ namespace Abp.Runtime.Caching.Redis
 
         public override void Initialize()
         {
-            IocManager.RegisterAssemblyByConvention(typeof(AbpRedisCacheModule).GetAssembly());
+            IocManager.RegisterAssemblyByConvention(typeof(AbpCsRedisCacheModule).GetAssembly());
         }
+
         public override void PostInitialize()
         {
             var options = IocManager.Resolve<AbpRedisCacheOptions>();
             var connectionString = options.ConnectionString;
             if (options.DatabaseId > -1)
-            {
                 connectionString = options.ConnectionString.TrimEnd(';') + ",defaultDatabase=" + options.DatabaseId;
-            }
-            RedisHelper.Initialization(new CSRedis.CSRedisClient(connectionString));
+            RedisHelper.Initialization(new CSRedisClient(connectionString));
         }
     }
 }
