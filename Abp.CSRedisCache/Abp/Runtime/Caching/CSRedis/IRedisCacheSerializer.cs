@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Abp.Runtime.Caching.Redis
+namespace Abp.Runtime.Caching.CSRedis
 {
     /// <summary>
     ///     Interface to be implemented by all custom (de)serialization methods used when persisting and retrieving
