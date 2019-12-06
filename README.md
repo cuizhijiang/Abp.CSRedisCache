@@ -6,14 +6,14 @@ Add a DependsOn attribute for the AbpRedisCacheModule and call the UseRedis exte
 ```csharp
 [DependsOn(
     //...other module dependencies
-    typeof(AbpRedisCacheModule))]
+    typeof(AbpCSRedisCacheModule))]
 public class MyProjectWebModule : AbpModule
 {
     public override void PreInitialize()
     {
         //...other configurations
         
-        Configuration.Caching.UseRedis(options =>
+        Configuration.Caching.UseCSRedis(options =>
         {
             options.ConnectionString = "127.0.0.1:6379,pass=123,defaultDatabase=13,poolsize=50,ssl=false,writeBuffer=10240";
         });
