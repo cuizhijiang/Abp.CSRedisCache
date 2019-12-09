@@ -22,7 +22,10 @@ namespace Abp.Runtime.Caching.CSRedis
 
         protected override void DisposeCaches()
         {
-            _iocManager.Dispose();
+            foreach (var cache in Caches)
+            {
+                _iocManager.Release(cache.Value);
+            }
         }
 
         protected override ICache CreateCacheImplementation(string name)

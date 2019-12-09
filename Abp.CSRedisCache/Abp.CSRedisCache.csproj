@@ -2,14 +2,14 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <Version>2.0.0-beta3</Version>
+    <Version>2.0.0</Version>
     <Authors>cuizhijiang</Authors>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <RootNamespace />
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Abp" Version="4.10.0" />
+    <PackageReference Include="Abp" Version="4.8.0" />
     <PackageReference Include="CSRedisCore" Version="3.1.8" />
   </ItemGroup>
 

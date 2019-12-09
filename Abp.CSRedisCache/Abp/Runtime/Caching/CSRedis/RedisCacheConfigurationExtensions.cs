@@ -13,9 +13,9 @@ namespace Abp.Runtime.Caching.CSRedis
         ///     Configures caching to use Redis as cache server.
         /// </summary>
         /// <param name="cachingConfiguration">The caching configuration.</param>
-        public static void UseRedis(this ICachingConfiguration cachingConfiguration)
+        public static void UseCSRedis(this ICachingConfiguration cachingConfiguration)
         {
-            cachingConfiguration.UseRedis(options => { });
+            cachingConfiguration.UseCSRedis(options => { });
         }
 
         /// <summary>
@@ -23,7 +23,7 @@ namespace Abp.Runtime.Caching.CSRedis
         /// </summary>
         /// <param name="cachingConfiguration">The caching configuration.</param>
         /// <param name="optionsAction">Ac action to get/set options</param>
-        public static void UseRedis(this ICachingConfiguration cachingConfiguration,
+        public static void UseCSRedis(this ICachingConfiguration cachingConfiguration,
             Action<AbpRedisCacheOptions> optionsAction)
         {
             var iocManager = cachingConfiguration.AbpConfiguration.IocManager;

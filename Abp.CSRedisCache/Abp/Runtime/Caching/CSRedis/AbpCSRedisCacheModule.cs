@@ -8,7 +8,7 @@ namespace Abp.Runtime.Caching.CSRedis
     ///     This modules is used to replace ABP's cache system with Redis server.
     /// </summary>
     [DependsOn(typeof(AbpKernelModule))]
-    public class AbpCsRedisCacheModule : AbpModule
+    public class AbpCSRedisCacheModule : AbpModule
     {
         public override void PreInitialize()
         {
@@ -17,7 +17,7 @@ namespace Abp.Runtime.Caching.CSRedis
 
         public override void Initialize()
         {
-            IocManager.RegisterAssemblyByConvention(typeof(AbpCsRedisCacheModule).GetAssembly());
+            IocManager.RegisterAssemblyByConvention(typeof(AbpCSRedisCacheModule).GetAssembly());
         }
 
         public override void PostInitialize()
