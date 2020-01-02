@@ -6,17 +6,17 @@ using System.Threading.Tasks;
 using Abp.Domain.Entities;
 using Abp.Reflection.Extensions;
 
-namespace Abp.Runtime.Caching.Redis
+namespace Abp.Runtime.Caching.CSRedis
 {
     /// <summary>
-    /// Used to store cache in a Redis server.
+    ///     Used to store cache in a Redis server.
     /// </summary>
     public class AbpRedisCache : CacheBase
     {
         private readonly IRedisCacheSerializer _serializer;
 
         /// <summary>
-        /// Constructor.
+        ///     Constructor.
         /// </summary>
         public AbpRedisCache(
             string name,
@@ -53,61 +53,54 @@ namespace Abp.Runtime.Caching.Redis
             return objbytes.ToArray();
         }
 
-        public override void Set(string key, object value, TimeSpan? slidingExpireTime = null, TimeSpan? absoluteExpireTime = null)
+        public override void Set(string key, object value, TimeSpan? slidingExpireTime = null,
+            TimeSpan? absoluteExpireTime = null)
         {
-            if (value == null)
-            {
-                throw new AbpException("Can not insert null values to the cache!");
-            }
-            RedisHelper.Set(GetLocalizedRedisKey(key), Serialize(value, GetSerializableType(value)), (int)(absoluteExpireTime ?? slidingExpireTime ?? DefaultAbsoluteExpireTime ?? DefaultSlidingExpireTime).TotalSeconds);
+            if (value == null) throw new AbpException("Can not insert null values to the cache!");
+            RedisHelper.Set(GetLocalizedRedisKey(key), Serialize(value, GetSerializableType(value)),
+                (int) (absoluteExpireTime ?? slidingExpireTime ?? DefaultAbsoluteExpireTime ?? DefaultSlidingExpireTime)
+                .TotalSeconds);
         }
 
-        public override async Task SetAsync(string key, object value, TimeSpan? slidingExpireTime = null, TimeSpan? absoluteExpireTime = null)
+        public override async Task SetAsync(string key, object value, TimeSpan? slidingExpireTime = null,
+            TimeSpan? absoluteExpireTime = null)
         {
-            if (value == null)
-            {
-                throw new AbpException("Can not insert null values to the cache!");
-            }
+            if (value == null) throw new AbpException("Can not insert null values to the cache!");
 
             await RedisHelper.SetAsync(
                 GetLocalizedRedisKey(key),
                 Serialize(value, GetSerializableType(value)),
-                (int)(absoluteExpireTime ?? slidingExpireTime ?? DefaultAbsoluteExpireTime ?? DefaultSlidingExpireTime).TotalSeconds
-                );
+                (int) (absoluteExpireTime ?? slidingExpireTime ?? DefaultAbsoluteExpireTime ?? DefaultSlidingExpireTime)
+                .TotalSeconds
+            );
         }
 
-        public override void Set(KeyValuePair<string, object>[] pairs, TimeSpan? slidingExpireTime = null, TimeSpan? absoluteExpireTime = null)
+        public override void Set(KeyValuePair<string, object>[] pairs, TimeSpan? slidingExpireTime = null,
+            TimeSpan? absoluteExpireTime = null)
         {
-            if (pairs.Any(p => p.Value == null))
-            {
-                throw new AbpException("Can not insert null values to the cache!");
-            }
+            if (pairs.Any(p => p.Value == null)) throw new AbpException("Can not insert null values to the cache!");
 
             var redisPairs = pairs.Select(p => new KeyValuePair<string, object>
-                                          (GetLocalizedRedisKey(p.Key), Serialize(p.Value, GetSerializableType(p.Value)))
-                                         );
+                (GetLocalizedRedisKey(p.Key), Serialize(p.Value, GetSerializableType(p.Value)))
+            );
 
             if (slidingExpireTime.HasValue || absoluteExpireTime.HasValue)
-            {
-                Logger.WarnFormat("{0}/{1} is not supported for Redis bulk insert of key-value pairs", nameof(slidingExpireTime), nameof(absoluteExpireTime));
-            }
+                Logger.WarnFormat("{0}/{1} is not supported for Redis bulk insert of key-value pairs",
+                    nameof(slidingExpireTime), nameof(absoluteExpireTime));
             RedisHelper.MSet(redisPairs.ToArray());
         }
 
-        public override async Task SetAsync(KeyValuePair<string, object>[] pairs, TimeSpan? slidingExpireTime = null, TimeSpan? absoluteExpireTime = null)
+        public override async Task SetAsync(KeyValuePair<string, object>[] pairs, TimeSpan? slidingExpireTime = null,
+            TimeSpan? absoluteExpireTime = null)
         {
-            if (pairs.Any(p => p.Value == null))
-            {
-                throw new AbpException("Can not insert null values to the cache!");
-            }
+            if (pairs.Any(p => p.Value == null)) throw new AbpException("Can not insert null values to the cache!");
 
             var redisPairs = pairs.Select(p => new KeyValuePair<string, object>
-                                          (GetLocalizedRedisKey(p.Key), Serialize(p.Value, GetSerializableType(p.Value)))
-                                         );
+                (GetLocalizedRedisKey(p.Key), Serialize(p.Value, GetSerializableType(p.Value)))
+            );
             if (slidingExpireTime.HasValue || absoluteExpireTime.HasValue)
-            {
-                Logger.WarnFormat("{0}/{1} is not supported for Redis bulk insert of key-value pairs", nameof(slidingExpireTime), nameof(absoluteExpireTime));
-            }
+                Logger.WarnFormat("{0}/{1} is not supported for Redis bulk insert of key-value pairs",
+                    nameof(slidingExpireTime), nameof(absoluteExpireTime));
             await RedisHelper.MSetAsync(redisPairs.ToArray());
         }
 
@@ -139,7 +132,7 @@ namespace Abp.Runtime.Caching.Redis
                 local keys = redis.call('keys', ARGV[1]) 
                 for i=1,#keys,5000 do 
                 redis.call('del', unpack(keys, i, math.min(i+4999, #keys)))
-                end","", GetLocalizedRedisKey("*"));
+                end", "", GetLocalizedRedisKey("*"));
         }
 
         protected virtual Type GetSerializableType(object value)
@@ -148,9 +141,7 @@ namespace Abp.Runtime.Caching.Redis
             //TODO: Normally, entities should not be stored in the cache, but currently Abp.Zero packages does it. It will be fixed in the future.
             var type = value.GetType();
             if (EntityHelper.IsEntity(type) && type.GetAssembly().FullName.Contains("EntityFrameworkDynamicProxies"))
-            {
                 type = type.GetTypeInfo().BaseType;
-            }
             return type;
         }
 

@@ -1,9 +1,9 @@
-﻿using Abp.Dependency;
+﻿using System;
+using Abp.Dependency;
 using Abp.Json;
 using Newtonsoft.Json;
-using System;
 
-namespace Abp.Runtime.Caching.Redis
+namespace Abp.Runtime.Caching.CSRedis
 {
     /// <summary>
     ///     Default implementation uses JSON as the underlying persistence mechanism.
@@ -21,7 +21,7 @@ namespace Abp.Runtime.Caching.Redis
             var serializerSettings = new JsonSerializerSettings();
             serializerSettings.Converters.Insert(0, new AbpDateTimeConverter());
 
-            AbpCacheData cacheData = AbpCacheData.Deserialize(objbyte);
+            var cacheData = AbpCacheData.Deserialize(objbyte);
 
             return cacheData.Payload.FromJsonString(
                 Type.GetType(cacheData.Type, true, true),
