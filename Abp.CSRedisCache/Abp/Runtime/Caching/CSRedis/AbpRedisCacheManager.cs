@@ -6,7 +6,7 @@ namespace Abp.Runtime.Caching.CSRedis
     /// <summary>
     ///     Used to create <see cref="AbpRedisCache" /> instances.
     /// </summary>
-    public class AbpRedisCacheManager : CacheManagerBase
+    public class AbpRedisCacheManager : CacheManagerBase<AbpRedisCache>
     {
         private readonly IIocManager _iocManager;
 
@@ -28,7 +28,7 @@ namespace Abp.Runtime.Caching.CSRedis
             }
         }
 
-        protected override ICache CreateCacheImplementation(string name)
+        protected override AbpRedisCache CreateCacheImplementation(string name)
         {
             return _iocManager.Resolve<AbpRedisCache>(new {name});
         }
