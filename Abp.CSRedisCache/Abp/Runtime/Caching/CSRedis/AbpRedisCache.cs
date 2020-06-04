@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Abp.Data;
 using Abp.Domain.Entities;
 using Abp.Reflection.Extensions;
 
@@ -160,10 +161,40 @@ namespace Abp.Runtime.Caching.CSRedis
             return GetLocalizedKey(key);
         }
 
-        [Obsolete]
         protected virtual string GetLocalizedKey(string key)
         {
             return "n:" + Name + ",c:" + key;
+        }
+
+        public override bool TryGetValue(string key, out object value)
+        {
+            var redisValue = RedisHelper.Get(GetLocalizedRedisKey(key));
+            value = redisValue ?? Deserialize(redisValue);
+            return redisValue!=null;
+        }
+
+        public override ConditionalValue<object>[] TryGetValues(string[] keys)
+        {
+            var redisKeys = keys.Select(GetLocalizedRedisKey);
+            var redisValues = RedisHelper.MGet(redisKeys.ToArray());
+            return redisValues.Select(CreateConditionalValue).ToArray();
+        }
+
+        public override async Task<ConditionalValue<object>> TryGetValueAsync(string key)
+        {
+            var redisValue = await RedisHelper.GetAsync(GetLocalizedRedisKey(key));
+            return CreateConditionalValue(redisValue);
+        }
+
+        public override async Task<ConditionalValue<object>[]> TryGetValuesAsync(string[] keys)
+        {
+            var redisKeys = keys.Select(GetLocalizedRedisKey);
+            var redisValues = await RedisHelper.MGetAsync(redisKeys.ToArray());
+            return redisValues.Select(CreateConditionalValue).ToArray();
+        }
+        protected ConditionalValue<object> CreateConditionalValue(string redisValue)
+        {
+            return new ConditionalValue<object>(redisValue==null,redisValue ?? Deserialize(redisValue));
         }
     }
 }
