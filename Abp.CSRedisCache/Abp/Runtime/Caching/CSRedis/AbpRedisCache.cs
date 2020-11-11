@@ -54,29 +54,35 @@ namespace Abp.Runtime.Caching.CSRedis
         }
 
         public override void Set(string key, object value, TimeSpan? slidingExpireTime = null,
-            TimeSpan? absoluteExpireTime = null)
+            DateTimeOffset? absoluteExpireTime = null)
         {
             if (value == null) throw new AbpException("Can not insert null values to the cache!");
+
+            var absoluteExpireTimeSpan = absoluteExpireTime - DateTimeOffset.Now;
+            var defaultAbsoluteExpireTimeTimeSpan = DefaultAbsoluteExpireTime - DateTimeOffset.Now;
+
+
             RedisHelper.Set(GetLocalizedRedisKey(key), Serialize(value, GetSerializableType(value)),
-                (int) (absoluteExpireTime ?? slidingExpireTime ?? DefaultAbsoluteExpireTime ?? DefaultSlidingExpireTime)
-                .TotalSeconds);
+                absoluteExpireTimeSpan ?? slidingExpireTime ?? defaultAbsoluteExpireTimeTimeSpan ?? DefaultSlidingExpireTime);
         }
 
         public override async Task SetAsync(string key, object value, TimeSpan? slidingExpireTime = null,
-            TimeSpan? absoluteExpireTime = null)
+            DateTimeOffset? absoluteExpireTime = null)
         {
             if (value == null) throw new AbpException("Can not insert null values to the cache!");
+            
+            var absoluteExpireTimeSpan = absoluteExpireTime - DateTimeOffset.Now;
+            var defaultAbsoluteExpireTimeTimeSpan = DefaultAbsoluteExpireTime - DateTimeOffset.Now;
 
             await RedisHelper.SetAsync(
                 GetLocalizedRedisKey(key),
                 Serialize(value, GetSerializableType(value)),
-                (int) (absoluteExpireTime ?? slidingExpireTime ?? DefaultAbsoluteExpireTime ?? DefaultSlidingExpireTime)
-                .TotalSeconds
+                absoluteExpireTimeSpan ?? slidingExpireTime ?? defaultAbsoluteExpireTimeTimeSpan ?? DefaultSlidingExpireTime
             );
         }
 
         public override void Set(KeyValuePair<string, object>[] pairs, TimeSpan? slidingExpireTime = null,
-            TimeSpan? absoluteExpireTime = null)
+            DateTimeOffset? absoluteExpireTime = null)
         {
             if (pairs.Any(p => p.Value == null)) throw new AbpException("Can not insert null values to the cache!");
 
@@ -91,7 +97,7 @@ namespace Abp.Runtime.Caching.CSRedis
         }
 
         public override async Task SetAsync(KeyValuePair<string, object>[] pairs, TimeSpan? slidingExpireTime = null,
-            TimeSpan? absoluteExpireTime = null)
+            DateTimeOffset? absoluteExpireTime = null)
         {
             if (pairs.Any(p => p.Value == null)) throw new AbpException("Can not insert null values to the cache!");
 
@@ -164,6 +170,20 @@ namespace Abp.Runtime.Caching.CSRedis
         protected virtual string GetLocalizedKey(string key)
         {
             return "n:" + Name + ",c:" + key;
+        }
+
+        public override bool TryGetValue(string key, out object value)
+        {
+            try
+            {
+                value = RedisHelper.Get(GetLocalizedRedisKey(key));
+                return true;
+            }
+            catch
+            {
+                value = null;
+                return false;
+            }
         }
     }
 }
