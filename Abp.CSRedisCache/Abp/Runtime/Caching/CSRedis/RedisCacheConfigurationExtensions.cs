@@ -1,6 +1,7 @@
 ﻿using System;
 using Abp.Dependency;
 using Abp.Runtime.Caching.Configuration;
+using CSRedis;
 
 namespace Abp.Runtime.Caching.CSRedis
 {
@@ -30,7 +31,13 @@ namespace Abp.Runtime.Caching.CSRedis
 
             iocManager.RegisterIfNot<ICacheManager, AbpRedisCacheManager>();
 
-            optionsAction(iocManager.Resolve<AbpRedisCacheOptions>());
+            var options= iocManager.Resolve<AbpRedisCacheOptions>();
+            optionsAction(options);
+
+            var connectionString = options.ConnectionString;
+            if (options.DatabaseId > -1)
+                connectionString = options.ConnectionString.TrimEnd(';') + ",defaultDatabase=" + options.DatabaseId;
+            RedisHelper.Initialization(new CSRedisClient(connectionString));
         }
     }
 }

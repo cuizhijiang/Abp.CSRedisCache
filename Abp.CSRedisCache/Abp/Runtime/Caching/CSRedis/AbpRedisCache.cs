@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Abp.Data;
 using Abp.Domain.Entities;
 using Abp.Reflection.Extensions;
 
@@ -166,7 +167,6 @@ namespace Abp.Runtime.Caching.CSRedis
             return GetLocalizedKey(key);
         }
 
-        [Obsolete]
         protected virtual string GetLocalizedKey(string key)
         {
             return "n:" + Name + ",c:" + key;
