@@ -55,29 +55,35 @@ namespace Abp.Runtime.Caching.CSRedis
         }
 
         public override void Set(string key, object value, TimeSpan? slidingExpireTime = null,
-            TimeSpan? absoluteExpireTime = null)
+            DateTimeOffset? absoluteExpireTime = null)
         {
             if (value == null) throw new AbpException("Can not insert null values to the cache!");
+
+            var absoluteExpireTimeSpan = absoluteExpireTime - DateTimeOffset.Now;
+            var defaultAbsoluteExpireTimeTimeSpan = DefaultAbsoluteExpireTime - DateTimeOffset.Now;
+
+
             RedisHelper.Set(GetLocalizedRedisKey(key), Serialize(value, GetSerializableType(value)),
-                (int) (absoluteExpireTime ?? slidingExpireTime ?? DefaultAbsoluteExpireTime ?? DefaultSlidingExpireTime)
-                .TotalSeconds);
+                absoluteExpireTimeSpan ?? slidingExpireTime ?? defaultAbsoluteExpireTimeTimeSpan ?? DefaultSlidingExpireTime);
         }
 
         public override async Task SetAsync(string key, object value, TimeSpan? slidingExpireTime = null,
-            TimeSpan? absoluteExpireTime = null)
+            DateTimeOffset? absoluteExpireTime = null)
         {
             if (value == null) throw new AbpException("Can not insert null values to the cache!");
+            
+            var absoluteExpireTimeSpan = absoluteExpireTime - DateTimeOffset.Now;
+            var defaultAbsoluteExpireTimeTimeSpan = DefaultAbsoluteExpireTime - DateTimeOffset.Now;
 
             await RedisHelper.SetAsync(
                 GetLocalizedRedisKey(key),
                 Serialize(value, GetSerializableType(value)),
-                (int) (absoluteExpireTime ?? slidingExpireTime ?? DefaultAbsoluteExpireTime ?? DefaultSlidingExpireTime)
-                .TotalSeconds
+                absoluteExpireTimeSpan ?? slidingExpireTime ?? defaultAbsoluteExpireTimeTimeSpan ?? DefaultSlidingExpireTime
             );
         }
 
         public override void Set(KeyValuePair<string, object>[] pairs, TimeSpan? slidingExpireTime = null,
-            TimeSpan? absoluteExpireTime = null)
+            DateTimeOffset? absoluteExpireTime = null)
         {
             if (pairs.Any(p => p.Value == null)) throw new AbpException("Can not insert null values to the cache!");
 
@@ -92,7 +98,7 @@ namespace Abp.Runtime.Caching.CSRedis
         }
 
         public override async Task SetAsync(KeyValuePair<string, object>[] pairs, TimeSpan? slidingExpireTime = null,
-            TimeSpan? absoluteExpireTime = null)
+            DateTimeOffset? absoluteExpireTime = null)
         {
             if (pairs.Any(p => p.Value == null)) throw new AbpException("Can not insert null values to the cache!");
 
@@ -168,33 +174,16 @@ namespace Abp.Runtime.Caching.CSRedis
 
         public override bool TryGetValue(string key, out object value)
         {
-            var redisValue = RedisHelper.Get(GetLocalizedRedisKey(key));
-            value = redisValue ?? Deserialize(redisValue);
-            return redisValue!=null;
-        }
-
-        public override ConditionalValue<object>[] TryGetValues(string[] keys)
-        {
-            var redisKeys = keys.Select(GetLocalizedRedisKey);
-            var redisValues = RedisHelper.MGet(redisKeys.ToArray());
-            return redisValues.Select(CreateConditionalValue).ToArray();
-        }
-
-        public override async Task<ConditionalValue<object>> TryGetValueAsync(string key)
-        {
-            var redisValue = await RedisHelper.GetAsync(GetLocalizedRedisKey(key));
-            return CreateConditionalValue(redisValue);
-        }
-
-        public override async Task<ConditionalValue<object>[]> TryGetValuesAsync(string[] keys)
-        {
-            var redisKeys = keys.Select(GetLocalizedRedisKey);
-            var redisValues = await RedisHelper.MGetAsync(redisKeys.ToArray());
-            return redisValues.Select(CreateConditionalValue).ToArray();
-        }
-        protected ConditionalValue<object> CreateConditionalValue(string redisValue)
-        {
-            return new ConditionalValue<object>(redisValue==null,redisValue ?? Deserialize(redisValue));
+            try
+            {
+                value = RedisHelper.Get(GetLocalizedRedisKey(key));
+                return true;
+            }
+            catch
+            {
+                value = null;
+                return false;
+            }
         }
     }
 }
