@@ -9,7 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="Abp" Version="4.0.0" />
-    <PackageReference Include="CSRedisCore" Version="3.0.35" />
+    <PackageReference Include="CSRedisCore" Version="3.6.6" />
   </ItemGroup>
 
 </Project>
