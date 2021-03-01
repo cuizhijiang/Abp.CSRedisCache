@@ -28,6 +28,10 @@ namespace Abp.Runtime.Caching.Redis
 
         public override object GetOrDefault(string key)
         {
+            if (!RedisHelper.Exists(GetLocalizedRedisKey(key)))
+            {
+                return null;
+            }
             var objbyte = RedisHelper.Get(GetLocalizedRedisKey(key));
             return !string.IsNullOrWhiteSpace(objbyte) ? Deserialize(objbyte) : null;
         }
